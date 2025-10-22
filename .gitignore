@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# VS Code
+.vscode/
+
+# Notebooks/cache
+.ipynb_checkpoints/
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# Project artifacts
+wandb/
