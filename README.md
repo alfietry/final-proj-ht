@@ -32,4 +32,3 @@ python demo_ttest.py
 
 Notes
 - W&B logs are stored locally in offline mode. You can set `WANDB_MODE` to `online` and provide `WANDB_API_KEY` to upload logs.
-- Keep it simple — this is just a demo script for quick experimentation.
