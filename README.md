@@ -19,7 +19,7 @@ This platform provides a comprehensive framework for:
 =======
 Environment variables
 - `OPENAI_API_KEY` (optional). If not set, the OpenAI step is skipped.
-- `DEEPSEEK_API_KEY` (optional). If not set, the OpenAI step is skipped.
+- `DEEPSEEK_API_KEY` (optional). If not set, the DeepSeek step is skipped.
 >>>>>>> 3a74966c83f8b0a8034b5a380fa51258407b8139
 
 ## ✨ Key Features
