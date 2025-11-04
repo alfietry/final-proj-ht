@@ -1,6 +1,10 @@
 # Comprehensive LLM Statistical Reasoning Evaluation Platform
 
+<<<<<<< HEAD
 A sophisticated research platform for evaluating and comparing Large Language Models' (LLMs) statistical reasoning capabilities through interactive hypothesis testing with multiple prompting strategies.
+=======
+This is a tiny demo that compares OpenAI's GPT-4 and a local Ollama gemma3:4b model on a one-sample t-test task.
+>>>>>>> 3a74966c83f8b0a8034b5a380fa51258407b8139
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -8,6 +12,7 @@ A sophisticated research platform for evaluating and comparing Large Language Mo
 
 ## 🎯 Overview
 
+<<<<<<< HEAD
 This platform provides a comprehensive framework for:
 - **Interactive Statistical Test Configuration**: Hierarchical menu system for complete test parameter setup
 - **LLM Performance Evaluation**: Compare OpenAI GPT-4 and DeepSeek models on statistical reasoning tasks
@@ -15,6 +20,11 @@ This platform provides a comprehensive framework for:
 - **Ground Truth Validation**: SciPy-based statistical calculations for accuracy assessment
 - **Experiment Tracking**: Automated logging with Weights & Biases (W&B)
 - **Flexible Data Generation**: Support for multiple distributions with customizable constraints
+=======
+Environment variables
+- `OPENAI_API_KEY` (optional). If not set, the OpenAI step is skipped.
+- Ollama must be running locally at `http://localhost:11434` with model name `gemma3:4b` to use the Ollama step. If not available, that step is skipped.
+>>>>>>> 3a74966c83f8b0a8034b5a380fa51258407b8139
 
 ## ✨ Key Features
 
@@ -65,6 +75,7 @@ git clone https://github.com/YOUR_USERNAME/llm-statistical-reasoning.git
 cd llm-statistical-reasoning
 ```
 
+<<<<<<< HEAD
 2. **Create virtual environment** (recommended)
 ```bash
 python -m venv .venv
@@ -511,3 +522,7 @@ Note: Very tight constraints may limit sample generation
 **Last Updated**: November 2024  
 **Python**: 3.8+  
 **Status**: Active Development
+=======
+Notes
+- W&B logs are stored locally in offline mode. You can set `WANDB_MODE` to `online` and provide `WANDB_API_KEY` to upload logs.
+>>>>>>> 3a74966c83f8b0a8034b5a380fa51258407b8139
