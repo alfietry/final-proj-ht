@@ -1,5 +1,5 @@
 """
-Simple demo comparing GPT-4 (OpenAI API) and Llama-3 (local Ollama) on a one-sample t-test task.
+Simple demo comparing GPT-4 (OpenAI API) and Gemma-3 (local Ollama) on a one-sample t-test task.
 
 Requirements (see requirements.txt):
   - openai
@@ -10,7 +10,7 @@ Requirements (see requirements.txt):
 
 Environment:
   - Set OPENAI_API_KEY to call OpenAI. If not set, the OpenAI call will be skipped.
-  - Ollama is expected to run locally at http://localhost:11434 and model name assumed 'llama3'. If not available, Ollama call will be skipped.
+  - Ollama is expected to run locally at http://localhost:11434 and model name assumed 'gemma3:4b'. If not available, Ollama call will be skipped.
 
 This script:
   - generates 30 data points from N(10,5) with fixed seed
@@ -52,18 +52,49 @@ def ground_truth_ttest(data, mu=10.0):
 
 
 def build_prompt(data, mu=10.0, alpha=0.05):
-    # Strongly request a single JSON object only. Keep prompt short for clarity.
-    prompt = (
-        f"You are given a dataset of {len(data)} numbers.\n"
-        f"Data: {json.dumps(data)}\n\n"
-        f"Perform a two-sided one-sample t-test for H0: mu = {mu} vs H1: mu != {mu} at alpha={alpha}.\n"
+    """Build a detailed prompt using the expert statistician template."""
+    
+    PROMPT_TEMPLATE = """
+You are an expert statistician. Perform a hypothesis test with the following information:
+
+DATA: {data}
+NULL HYPOTHESIS (H₀): μ = {mu}
+SIGNIFICANCE LEVEL (α): {alpha}
+
+Please provide your analysis with the following structure:
+
+1. TEST SELECTION: 
+   - Which statistical test is appropriate and why?
+   - Should this be a one-tailed or two-tailed test? Justify your choice.
+   - State your alternative hypothesis (H₁) based on your tail selection.
+
+2. CALCULATIONS: Show your work and calculations
+   - Sample statistics (mean, standard deviation, sample size)
+   - Test statistic calculation
+   - Critical value(s) or p-value calculation
+
+3. RESULTS: 
+   - Test statistic value
+   - P-value 
+   - Critical value(s)
+   - Confidence interval (if applicable)
+
+4. CONCLUSION: State whether you reject or fail to reject H₀
+
+Ensure your reasoning is statistically sound.
+
+After your analysis, end with a JSON summary:
+{{"p_value": <numeric_value>, "conclusion": "reject" or "fail to reject", "test_type": "one-tailed" or "two-tailed", "alternative_hypothesis": "your H1 statement"}}
+"""
+    
+    # Format the template with actual values - removed alternative hypothesis to let model decide
+    formatted_prompt = PROMPT_TEMPLATE.format(
+        data=json.dumps(data),
+        mu=mu,
+        alpha=alpha
     )
-    prompt += (
-        "\n\nReturn a single valid JSON object and nothing else with this exact schema:\n"
-        "{\n  \"p_value\": <number between 0 and 1>,\n  \"conclusion\": \"reject\" or \"fail to reject\"\n}\n"
-        "Do NOT include extra explanation or code fences. Use a numeric value for p_value (e.g. 0.12345)."
-    )
-    return prompt
+    
+    return formatted_prompt
 
 
 def call_openai(prompt: str, model: str = "gpt-4") -> Optional[str]:
@@ -71,11 +102,12 @@ def call_openai(prompt: str, model: str = "gpt-4") -> Optional[str]:
     if not api_key or openai is None:
         print("OpenAI API key not set or openai package missing — skipping OpenAI call.")
         return None
-    # Try to support both modern openai>=1.0 client and the older interface.
+    
     messages = [
         {"role": "system", "content": (
-            "You are a concise statistics assistant. Output ONLY a single valid JSON object matching the schema: "
-            "{\"p_value\": <number>, \"conclusion\": \"reject\" or \"fail to reject\"}." )},
+            "You are an expert statistician. Provide detailed statistical analysis "
+            "followed by a JSON summary as requested in the prompt."
+        )},
         {"role": "user", "content": prompt},
     ]
 
@@ -104,7 +136,12 @@ def call_openai(prompt: str, model: str = "gpt-4") -> Optional[str]:
         OpenAIClient = getattr(openai, "OpenAI", None)
         if OpenAIClient is not None:
             client = OpenAIClient()
-            resp = client.chat.completions.create(model=model, messages=messages, max_tokens=300, temperature=0.0)
+            resp = client.chat.completions.create(
+                model=model, 
+                messages=messages, 
+                max_tokens=800,  # Increased from 300
+                temperature=0.0
+            )
         else:
             # fallback to legacy interface (may raise on openai>=1.0)
             # keep compatibility for older installed versions
@@ -154,6 +191,67 @@ def call_ollama(prompt: str, model: str = "gemma3:4b") -> Optional[str]:
         return None
 
 
+def call_deepseek(prompt: str, model: str = "deepseek-chat") -> Optional[str]:
+    """Call DeepSeek Chat API for hypothesis testing analysis."""
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        print("DeepSeek API key not set — skipping DeepSeek call.")
+        return None
+    
+    print(f"Using DeepSeek model: {model}")  # Debug info
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    messages = [
+        {"role": "system", "content": (
+            "You are an expert statistician. Provide detailed statistical analysis "
+            "followed by a JSON summary as requested in the prompt. "
+            "Follow the exact format: 1. TEST SELECTION, 2. CALCULATIONS, 3. RESULTS, 4. CONCLUSION, then JSON."
+        )},
+        {"role": "user", "content": prompt},
+    ]
+    
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": 1000,  # Increased for detailed analysis
+        "temperature": 0.0,
+        "stream": False
+    }
+    
+    try:
+        r = requests.post(
+            "https://api.deepseek.com/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        print(f"DeepSeek HTTP Status: {r.status_code}")  # Debug info
+        
+        r.raise_for_status()
+        data = r.json()
+        
+        # Log raw response for debugging
+        try:
+            print("DEEPSEEK_RAW_RESPONSE_JSON:", json.dumps(data, default=str))
+        except Exception:
+            print("DEEPSEEK_RAW_RESPONSE (repr):", repr(data))
+        
+        # Extract content from response
+        if "choices" in data and len(data["choices"]) > 0:
+            content = data["choices"][0]["message"]["content"].strip()
+            return content
+        
+        return None
+    except Exception as e:
+        print(f"DeepSeek call failed: {e}")
+        return None
+
+
 def parse_json_pvalue(text: str) -> Optional[Dict[str, Any]]:
     if not text:
         return None
@@ -167,6 +265,9 @@ def parse_json_pvalue(text: str) -> Optional[Dict[str, Any]]:
             j = json.loads(m_json.group(0))
             p = None
             conclusion = None
+            test_type = None
+            alternative_hypothesis = None
+            
             for k, v in j.items():
                 kl = k.lower()
                 if kl.startswith('p') and p is None:
@@ -181,7 +282,18 @@ def parse_json_pvalue(text: str) -> Optional[Dict[str, Any]]:
                             pass
                 if isinstance(v, str) and ('reject' in v.lower() or 'fail' in v.lower()):
                     conclusion = v
-            return {"p_value": p, "conclusion": conclusion, "raw": j}
+                if 'test_type' in kl or 'tail' in kl:
+                    test_type = v
+                if 'alternative' in kl or 'h1' in kl or 'h_1' in kl:
+                    alternative_hypothesis = v
+                    
+            return {
+                "p_value": p, 
+                "conclusion": conclusion, 
+                "test_type": test_type,
+                "alternative_hypothesis": alternative_hypothesis,
+                "raw": j
+            }
         except Exception:
             pass
 
@@ -236,13 +348,16 @@ def main():
     # Call OpenAI
     openai_resp = call_openai(prompt)
     openai_parsed = parse_json_pvalue(openai_resp) if openai_resp else None
-
     wandb_run.log({'openai_response': openai_resp, 'openai_parsed': openai_parsed})
+
+    # Call DeepSeek Chat
+    deepseek_resp = call_deepseek(prompt)
+    deepseek_parsed = parse_json_pvalue(deepseek_resp) if deepseek_resp else None
+    wandb_run.log({'deepseek_response': deepseek_resp, 'deepseek_parsed': deepseek_parsed})
 
     # Call Ollama
     ollama_resp = call_ollama(prompt)
     ollama_parsed = parse_json_pvalue(ollama_resp) if ollama_resp else None
-
     wandb_run.log({'ollama_response': ollama_resp, 'ollama_parsed': ollama_parsed})
 
     # Print concise comparison
@@ -262,6 +377,7 @@ def main():
             print(f'interpreted p = {pv:.4f} -> {decision}')
 
     show('OpenAI (gpt-4)', openai_resp, openai_parsed)
+    show('DeepSeek (chat)', deepseek_resp, deepseek_parsed)
     show('Ollama (gemma3:4b)', ollama_resp, ollama_parsed)
 
     wandb_run.finish()

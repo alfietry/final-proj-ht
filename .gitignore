@@ -1,21 +1,60 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
 .venv/
 venv/
-.env
+ENV/
+env/
 
-# VS Code
+# IDEs
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Notebooks/cache
-.ipynb_checkpoints/
-.pytest_cache/
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables (IMPORTANT - don't commit API keys!)
+.env
+*.env
+
+# W&B
+wandb/
+*.wandb
 
 # OS
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# Project artifacts
-wandb/
+# Test outputs
+*.json
+*.csv
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
