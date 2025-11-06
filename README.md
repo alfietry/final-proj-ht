@@ -67,7 +67,7 @@ Python 3.8 or higher
 
 1. **Clone the repository** (or download the files)
 ```bash
-git clone https://github.com/YOUR_USERNAME/llm-statistical-reasoning.git
+git clone https://github.com/alfietry/llm-statistical-reasoning.git
 cd llm-statistical-reasoning
 ```
 
