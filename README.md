@@ -1,6 +1,6 @@
 # LLM Hypothesis Testing Reasoning Evaluation Platform
 
-A research platform for evaluating and comparing Large Language Models' (LLMs) statistical reasoning capabilities through interactive hypothesis testing with multiple prompting strategies.
+##A research platform for evaluating and comparing Large Language Models' (LLMs) statistical reasoning capabilities through interactive hypothesis testing with multiple prompting strategies.
 =======
 
 [![W&B](https://img.shields.io/badge/Weights_&_Biases-Experiment_Tracking-orange)](https://wandb.ai/)
