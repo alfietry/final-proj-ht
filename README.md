@@ -1,6 +1,5 @@
 # LLM Hypothesis Testing Reasoning Evaluation Platform
 
-HEAD
 A research platform for evaluating and comparing Large Language Models' (LLMs) statistical reasoning capabilities through interactive hypothesis testing with multiple prompting strategies.
 =======
 
@@ -8,7 +7,7 @@ A research platform for evaluating and comparing Large Language Models' (LLMs) s
 
 ## 🎯 Overview
 
-<<<<<<< HEAD
+
 This platform provides a comprehensive framework for:
 - **Interactive Statistical Test Configuration**: Hierarchical menu system for complete test parameter setup
 - **LLM Performance Evaluation**: Compare OpenAI GPT-4 and DeepSeek models on statistical reasoning tasks
@@ -16,11 +15,11 @@ This platform provides a comprehensive framework for:
 - **Ground Truth Validation**: SciPy-based statistical calculations for accuracy assessment
 - **Experiment Tracking**: Automated logging with Weights & Biases (W&B)
 - **Flexible Data Generation**: Support for multiple distributions with customizable constraints
-=======
+
 Environment variables
 - `OPENAI_API_KEY` (optional). If not set, the OpenAI step is skipped.
 - `DEEPSEEK_API_KEY` (optional). If not set, the DeepSeek step is skipped.
->>>>>>> 3a74966c83f8b0a8034b5a380fa51258407b8139
+
 
 ## ✨ Key Features
 
@@ -71,7 +70,6 @@ git clone https://github.com/alfietry/llm-statistical-reasoning.git
 cd llm-statistical-reasoning
 ```
 
-<<<<<<< HEAD
 2. **Create virtual environment** (recommended)
 ```bash
 python -m venv .venv
@@ -511,7 +509,7 @@ Note: Very tight constraints may limit sample generation
 - **DeepSeek**: DeepSeek Chat API access
 - **Weights & Biases**: Experiment tracking platform
 - **Research Papers**: Prompt engineering strategies from Wei et al. (2022), Shanahan et al. (2023), and Liu et al. (2023)
-- **GitCopilot**: Code generator
+- **GitCopilot**: Code aid
 
 --
 
@@ -521,4 +519,3 @@ Note: Very tight constraints may limit sample generation
 =======
 Notes
 - W&B logs are stored locally in offline mode. You can set `WANDB_MODE` to `online` and provide `WANDB_API_KEY` to upload logs.
->>>>>>> 3a74966c83f8b0a8034b5a380fa51258407b8139
